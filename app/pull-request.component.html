@@ -1,9 +1,13 @@
-<div *ngIf="pullRequest">
-	<h2>{{pullRequest.title}}</h2>
-	<div><label>ID: </label>{{pullRequest.pullRequestId}}</div>
-	<div><label>Status: </label>{{pullRequest.status}}</div>
-	<div><label>Merge status: </label>{{pullRequest.mergeStatus}}</div>
-	<div><label>Description: </label>{{pullRequest.description}}</div>
+<div *ngIf="pullRequest" class="row">
+	<div class="col-xs-12">
+		<div class="jumbotron container-padding">
+			<h2>{{pullRequest.title}}</h2>
+			<div><label>ID: </label>{{pullRequest.pullRequestId}}</div>
+			<div><label>Status: </label>{{pullRequest.status}}</div>
+			<div><label>Merge status: </label>{{pullRequest.mergeStatus}}</div>
+			<div><label>Description: </label>{{pullRequest.description}}</div>
 
-	<build-info *ngFor="let build of pullRequest.builds" [build]="build"></build-info>
+			<build-info *ngFor="let build of pullRequest.builds" [build]="build"></build-info>
+		</div>
+	</div>
 </div>

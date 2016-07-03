@@ -9,4 +9,12 @@ import { IBuildInfo } from './build-info';
 export class BuildInfoComponent {
 	@Input()
 	public build: IBuildInfo;
+
+	private isFailed() : boolean {
+		return this.build && this.build.status == "completed" && this.build.result == "failed";
+	}
+
+	private isSuccessful() : boolean {
+		return this.build && this.build.status == "completed" && this.build.result == "succeeded";
+	}
 }

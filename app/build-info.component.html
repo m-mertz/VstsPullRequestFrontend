@@ -1,4 +1,4 @@
-<div *ngIf="build">
+<div *ngIf="build" class="well" [class.failed-build]="isFailed()" [class.successful-build]="isSuccessful()">
 	<h3>Build ID {{build.id}}</h3>
 	<div><label>Status: </label>{{build.status}}</div>
 	<div><label>Result: </label>{{build.result}}</div>

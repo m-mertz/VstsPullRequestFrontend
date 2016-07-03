@@ -1,11 +1,26 @@
-<h1>Pull Requests</h1>
-
-<label for="usernameInput">User name:</label>
-<input type="text" id="usernameInput" #username />
-<br />
-<label for="passwordInput">Password:</label>
-<input type="password" id="passwordInput" #password />
-<br />
-<button (click)="loadPullRequests(username.value, password.value)">Load</button>
-<br />
-<pull-request *ngFor="let pullRequest of pullRequests" [pullRequest]="pullRequest"></pull-request>
+<div class="container">
+	<div class="row">
+		<div class="col-xs-12">
+			<h1>Pull Requests</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="jumbotron container-padding">
+				<form (ngSubmit)="loadPullRequests(username.value, password.value)">
+					<div class="form-group">
+						<label for="usernameInput">User name</label>
+						<input type="text" class="form-control" name="usernameInput" #username placeholder="User name" required />
+					</div>
+					<div class="form-group">
+						<label for="passwordInput">Password</label>
+						<input type="password" class="form-control" name="passwordInput" #password placeholder="Password" required />
+					</div>
+					<button type="submit" class="btn btn-primary">Load pull requests</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<hr />
+	<pull-request *ngFor="let pullRequest of pullRequests" [pullRequest]="pullRequest"></pull-request>
+</div>
