@@ -8,4 +8,4 @@
 <br />
 <button (click)="loadPullRequests(username.value, password.value)">Load</button>
 <br />
-<div id="result"></div>
+<pull-request *ngFor="let pullRequest of pullRequests" [pullRequest]="pullRequest"></pull-request>

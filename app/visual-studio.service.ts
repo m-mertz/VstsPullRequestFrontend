@@ -2,19 +2,12 @@ import { Injectable } from '@angular/core';
 import { VisualStudioConfig } from './visual-studio.config';
 import { Headers, Http, Response } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
+import { IPullRequest } from './pull-request'
 
 export interface IPullRequestsResponse {
 	success: boolean,
 	data: IPullRequest[],
 	error: any
-}
-
-export interface IPullRequest {
-	pullRequestId: number,
-	status: string,
-	title: string,
-	description: string,
-	mergeStatus: string
 }
 
 @Injectable()
