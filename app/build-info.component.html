@@ -1,0 +1,10 @@
+<div *ngIf="build">
+	<h3>Build ID {{build.id}}</h3>
+	<div><label>Status: </label>{{build.status}}</div>
+	<div><label>Result: </label>{{build.result}}</div>
+	<div><label>Queue time: </label>{{build.queueTime}}</div>
+	<div><label>Start time: </label>{{build.startTime}}</div>
+	<div><label>Finish time: </label>{{build.finishTime}}</div>
+	<div><label>Source branch: </label>{{build.sourceBranch}}</div>
+	<div><label>Source version: </label>{{build.sourceVersion}}</div>
+</div>

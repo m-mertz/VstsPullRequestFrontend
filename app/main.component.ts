@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { VisualStudioService, IPullRequestsResponse } from './visual-studio.service';
 import { PullRequestComponent } from './pull-request.component';
-import { IPullRequest } from './pull-request';
+import { PullRequest } from './pull-request';
+import { IBuildInfo } from './build-info';
 
 @Component({
 	selector: 'main-app',
@@ -11,20 +12,40 @@ import { IPullRequest } from './pull-request';
 })
 
 export class AppComponent {
-	private pullRequests : IPullRequest[] = null;
+	private pullRequests: PullRequest[] = null;
+	private builds: IBuildInfo[] = null;
 
-	constructor(private visualStudioService: VisualStudioService) {
+	public constructor(private visualStudioService: VisualStudioService) {
 	}
 
-	loadPullRequests(username: string, password: string) : void {
+	public loadPullRequests(username: string, password: string) : void {
+		this.pullRequests = this.builds = null;
+
 		this.visualStudioService.getPullRequests(username, password)
 			.then(response => {
 				console.debug("Success: " + JSON.stringify(response));
-				this.pullRequests = response.data;
+				this.pullRequests = response.data.map(src => new PullRequest(src));
+
+				if (this.pullRequests.length > 0) {
+					this.loadBuildsForPullRequests(username, password);
+				}
 			})
 			.catch(error => {
 				console.error("Error: " + JSON.stringify(error));
 				this.pullRequests = null;
 			});
+	}
+
+	private loadBuildsForPullRequests(username: string, password: string) : void {
+		this.visualStudioService.getBuildsForUser(username, password)
+			.then(response => {
+				console.debug("Success: " + JSON.stringify(response));
+				this.builds = response.data;
+				this.pullRequests.forEach(pullRequest => pullRequest.extractBuilds(this.builds));
+			})
+			.catch(error => {
+				console.error("Error: " + JSON.stringify(error));
+				this.builds = null;
+			})
 	}
 }
