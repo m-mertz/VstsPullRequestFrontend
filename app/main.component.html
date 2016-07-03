@@ -1,1 +1,11 @@
-<h1>Placeholder</h1>
+<h1>Pull Requests</h1>
+
+<label for="usernameInput">User name:</label>
+<input type="text" id="usernameInput" #username />
+<br />
+<label for="passwordInput">Password:</label>
+<input type="password" id="passwordInput" #password />
+<br />
+<button (click)="loadPullRequests(username.value, password.value)">Load</button>
+<br />
+<div id="result"></div>
