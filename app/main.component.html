@@ -22,5 +22,14 @@
 		</div>
 	</div>
 	<hr />
+	<div *ngIf="errors && errors.length > 0" class="row">
+		<div class="col-xs-12">
+			<div class="jumbotron container-padding">
+				<div *ngFor="let error of errors" class="bg-danger">
+					{{error}}
+				</div>
+			</div>
+		</div>
+	</div>
 	<pull-request *ngFor="let pullRequest of pullRequests" [pullRequest]="pullRequest"></pull-request>
 </div>

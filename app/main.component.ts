@@ -14,6 +14,7 @@ import { IBuildInfo } from './build-info';
 export class AppComponent {
 	private pullRequests: PullRequest[] = null;
 	private builds: IBuildInfo[] = null;
+	private errors: Array<string> = [];
 
 	public constructor(private visualStudioService: VisualStudioService) {
 	}
@@ -31,6 +32,7 @@ export class AppComponent {
 			})
 			.catch(error => {
 				console.error("Error: " + JSON.stringify(error));
+				this.errors.push("An error occurred loading pull requests");
 				this.pullRequests = null;
 			});
 	}
@@ -43,6 +45,7 @@ export class AppComponent {
 			})
 			.catch(error => {
 				console.error("Error: " + JSON.stringify(error));
+				this.errors.push("An error occurred loading builds");
 				this.builds = null;
 			})
 	}
