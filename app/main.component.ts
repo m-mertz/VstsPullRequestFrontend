@@ -23,7 +23,6 @@ export class AppComponent {
 
 		this.visualStudioService.getPullRequests(username, password)
 			.then(response => {
-				console.debug("Success: " + JSON.stringify(response));
 				this.pullRequests = response.data.map(src => new PullRequest(src));
 
 				if (this.pullRequests.length > 0) {
@@ -39,7 +38,6 @@ export class AppComponent {
 	private loadBuildsForPullRequests(username: string, password: string) : void {
 		this.visualStudioService.getBuildsForUser(username, password)
 			.then(response => {
-				console.debug("Success: " + JSON.stringify(response));
 				this.builds = response.data;
 				this.pullRequests.forEach(pullRequest => pullRequest.extractBuilds(this.builds));
 			})

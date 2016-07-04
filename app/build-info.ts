@@ -1,3 +1,5 @@
+import { IUserInfo } from './user-info';
+
 export interface IBuildInfo {
 	id: number,
 	buildNumber: string,
@@ -7,5 +9,6 @@ export interface IBuildInfo {
 	startTime: string,
 	finishTime: string,
 	sourceBranch: string,
-	sourceVersion: string
+	sourceVersion: string,
+	requestedFor: IUserInfo
 }
