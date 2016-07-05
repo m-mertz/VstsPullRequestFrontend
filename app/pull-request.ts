@@ -38,4 +38,8 @@ export class PullRequest implements IPullRequest {
 			}
 		});
 	}
+
+	public clearBuilds() : void {
+		this.builds = [];
+	}
 }

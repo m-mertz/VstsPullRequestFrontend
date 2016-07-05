@@ -7,7 +7,7 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="jumbotron container-padding">
-				<form (ngSubmit)="login()">
+				<form (ngSubmit)="loadProjects()">
 					<div class="form-group">
 						<label for="accountInput">VSTS Account (https://{account}.visualstudio.com/)</label>
 						<input type="text" [(ngModel)]="account" class="form-control" name="accountInput" placeholder="{account}" required />
@@ -31,10 +31,18 @@
 				<form>
 					<div class="form-group">
 						<label for="projectSelect">Project</label>
-						<select [(ngModel)]="selectedProjectId" name="projectSelect">
-							<option *ngFor="let project of projects" value="{{project.id}}">{{project.name}}</option>
+						<select [(ngModel)]="selectedProjectId" (change)="onSelectedProjectChange($event)" name="projectSelect">
+							<option *ngFor="let project of projects" [value]="project.id">{{project.name}}</option>
 						</select>
 					</div>
+					<div class="form-group">
+						<label for="repositorySelect">Repository</label>
+						<select [(ngModel)]="selectedRepositoryId" name="repositorySelect" [disabled]="!repositories || repositories.length < 1">
+							<option *ngFor="let repository of repositories" [value]="repository.id">{{repository.name}}</option>
+						</select>
+					</div>
+					<button type="button" (click)="loadPullRequests()" class="btn btn-primary"
+						[disabled]="!selectedProjectId || !selectedRepositoryId">Load Pull Requests</button>
 				</form>
 			</div>
 		</div>
