@@ -7,18 +7,6 @@ import { IUserInfo } from './user-info';
 import { IProjectInfo } from './project-info';
 import { IRepositoryInfo } from './repository-info';
 
-export interface IPullRequestsResponse {
-	success: boolean,
-	data: IPullRequest[],
-	error: any
-}
-
-export interface IBuildsResponse {
-	success: boolean,
-	data: IBuildInfo[],
-	error: any
-}
-
 @Injectable()
 export class VisualStudioService {
 	public getProjects(account: string, username: string, password: string) : Promise<IProjectInfo[]> {
@@ -35,7 +23,7 @@ export class VisualStudioService {
 			.catch((error: any) => Promise.reject<IRepositoryInfo[]>(error));
 	}
 
-	public getPullRequests(account: string, username: string, password: string, projectId: string, repositoryId: string) : Promise<IPullRequestsResponse> {
+	public getPullRequests(account: string, username: string, password: string, projectId: string, repositoryId: string) : Promise<IPullRequest[]> {
 		let cachedUserId: string = this.userIdByUserName[username];
 		let userIdPromise: Promise<string> = cachedUserId
 			? Promise.resolve<string>(cachedUserId)
@@ -46,17 +34,17 @@ export class VisualStudioService {
 				this.userIdByUserName[username] = userId;
 				return this.http.get(this.pullRequestsCreatedByUserUrl(account, userId, repositoryId), { headers: this.buildHeaders(username, password) })
 					.toPromise()
-					.then((response: Response) => <IPullRequestsResponse>{ success: true, data: response.json().value, error: null })
-					.catch((error: any) => Promise.reject<IPullRequestsResponse>({ success: false, data: null, error: error }));
+					.then((response: Response) => response.json().value)
+					.catch((error: any) => Promise.reject<IPullRequest[]>(error));
 			})
-			.catch((error: any) => Promise.reject<IPullRequestsResponse>({ success: false, data: null, error: error }));
+			.catch((error: any) => Promise.reject<IPullRequest[]>(error));
 	}
 
-	public getBuildsForUser(account: string, username: string, password: string, projectId: string) : Promise<IBuildsResponse> {
+	public getBuildsForUser(account: string, username: string, password: string, projectId: string) : Promise<IBuildInfo[]> {
 		return this.http.get(this.buildsForUserUrl(account, username, projectId, null), { headers: this.buildHeaders(username, password) })
 			.toPromise()
-			.then((response: Response) => <IBuildsResponse>{ success: true, data: response.json().value, error: null })
-			.catch((error: any) => Promise.reject<IBuildsResponse>({ success: false, data: null, error: error }));
+			.then((response: Response) => response.json().value)
+			.catch((error: any) => Promise.reject<IBuildInfo[]>(error));
 	}
 
 	private getUserId(account: string, username: string, password: string, projectId: string) : Promise<string> {
@@ -65,15 +53,15 @@ export class VisualStudioService {
 		return this.http.get(this.buildsForUserUrl(account, username, projectId, 1), { headers: this.buildHeaders(username, password) })
 			.toPromise()
 			.then((response: Response) => {
-				let result: IBuildInfo[] = response.json().value;
-				let id: string = result[0].requestedFor.id;
-				if (id) {
-					return id;
+				let builds: IBuildInfo[] = response.json().value;
+				if (builds.length > 0 && builds[0].requestedFor.id) {
+					return builds[0].requestedFor.id;
 				} else {
 					console.error("Failed to parse user id from response: " + JSON.stringify(response));
 					return Promise.reject<string>("Invalid response from server, could not retrieve ID for user " + username);
 				}
-			});
+			})
+			.catch((error: any) => Promise.reject<string>(error));
 	}
 
 	private getProjectsUrl(account: string) : string {

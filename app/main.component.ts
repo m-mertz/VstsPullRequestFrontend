@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { VisualStudioService, IPullRequestsResponse } from './visual-studio.service';
+import { VisualStudioService } from './visual-studio.service';
 import { PullRequestComponent } from './pull-request.component';
 import { PullRequest } from './pull-request';
 import { IBuildInfo } from './build-info';
@@ -80,7 +80,7 @@ export class AppComponent {
 
 		this.visualStudioService.getPullRequests(this.account, this.username, this.password, this.selectedProjectId, this.selectedRepositoryId)
 			.then(response => {
-				this.pullRequests = response.data.map(src => new PullRequest(src));
+				this.pullRequests = response.map(src => new PullRequest(src));
 
 				if (this.pullRequests.length > 0) {
 					this.loadBuildsForPullRequests(this.account, this.username, this.password);
@@ -98,7 +98,7 @@ export class AppComponent {
 
 		this.visualStudioService.getBuildsForUser(account, username, password, this.selectedProjectId)
 			.then(response => {
-				this.builds = response.data;
+				this.builds = response;
 				this.pullRequests.forEach(pullRequest => pullRequest.extractBuilds(this.builds));
 			})
 			.catch(error => {
