@@ -7,16 +7,34 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="jumbotron container-padding">
-				<form (ngSubmit)="loadPullRequests(username.value, password.value)">
+				<form (ngSubmit)="login()">
+					<div class="form-group">
+						<label for="accountInput">VSTS Account (https://{account}.visualstudio.com/)</label>
+						<input type="text" [(ngModel)]="account" class="form-control" name="accountInput" placeholder="{account}" required />
+					</div>
 					<div class="form-group">
 						<label for="usernameInput">User name</label>
-						<input type="text" class="form-control" name="usernameInput" #username placeholder="User name" required />
+						<input type="text" [(ngModel)]="username" class="form-control" name="usernameInput" placeholder="User name" required />
 					</div>
 					<div class="form-group">
 						<label for="passwordInput">Password</label>
-						<input type="password" class="form-control" name="passwordInput" #password placeholder="Password" required />
+						<input type="password" [(ngModel)]="password" class="form-control" name="passwordInput" placeholder="Password" required />
 					</div>
-					<button type="submit" class="btn btn-primary">Load pull requests</button>
+					<button type="submit" class="btn btn-primary">Login</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div *ngIf="projects && projects.length > 0" class="row">
+		<div class="col-xs-12">
+			<div class="jumbotron container-padding">
+				<form>
+					<div class="form-group">
+						<label for="projectSelect">Project</label>
+						<select [(ngModel)]="selectedProjectId" name="projectSelect">
+							<option *ngFor="let project of projects" value="{{project.id}}">{{project.name}}</option>
+						</select>
+					</div>
 				</form>
 			</div>
 		</div>

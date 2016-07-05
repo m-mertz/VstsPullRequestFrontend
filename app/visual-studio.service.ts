@@ -5,6 +5,7 @@ import 'rxjs/add/operator/toPromise';
 import { IPullRequest } from './pull-request';
 import { IBuildInfo } from './build-info';
 import { IUserInfo } from './user-info';
+import { IProjectInfo } from './project-info';
 
 export interface IPullRequestsResponse {
 	success: boolean,
@@ -20,16 +21,23 @@ export interface IBuildsResponse {
 
 @Injectable()
 export class VisualStudioService {
-	public getPullRequests(username: string, password: string) : Promise<IPullRequestsResponse> {
+	public getProjects(account: string, username: string, password: string) : Promise<IProjectInfo[]> {
+		return this.http.get(this.getProjectsUrl(account), { headers: this.buildHeaders(username, password) })
+			.toPromise()
+			.then((response: Response) => response.json().value)
+			.catch((error: any) => Promise.reject<IProjectInfo[]>(error));
+	}
+
+	public getPullRequests(account: string, username: string, password: string) : Promise<IPullRequestsResponse> {
 		let cachedUserId: string = this.userIdByUserName[username];
 		let userIdPromise: Promise<string> = cachedUserId
 			? Promise.resolve<string>(cachedUserId)
-			: this.getUserId(username, password);
+			: this.getUserId(account, username, password);
 
 		return userIdPromise
 			.then(userId => {
 				this.userIdByUserName[username] = userId;
-				return this.http.get(this.pullRequestsCreatedByUserUrl(userId), { headers: this.buildHeaders(username, password) })
+				return this.http.get(this.pullRequestsCreatedByUserUrl(account, userId), { headers: this.buildHeaders(username, password) })
 					.toPromise()
 					.then((response: Response) => <IPullRequestsResponse>{ success: true, data: response.json().value, error: null })
 					.catch((error: any) => Promise.reject<IPullRequestsResponse>({ success: false, data: null, error: error }));
@@ -37,15 +45,17 @@ export class VisualStudioService {
 			.catch((error: any) => Promise.reject<IPullRequestsResponse>({ success: false, data: null, error: error }));
 	}
 
-	public getBuildsForUser(username: string, password: string) : Promise<IBuildsResponse> {
-		return this.http.get(this.buildsForUserUrl(username, VisualStudioConfig.buildQueue, null), { headers: this.buildHeaders(username, password) })
+	public getBuildsForUser(account: string, username: string, password: string) : Promise<IBuildsResponse> {
+		return this.http.get(this.buildsForUserUrl(account, username, VisualStudioConfig.buildQueue, null), { headers: this.buildHeaders(username, password) })
 			.toPromise()
 			.then((response: Response) => <IBuildsResponse>{ success: true, data: response.json().value, error: null })
 			.catch((error: any) => Promise.reject<IBuildsResponse>({ success: false, data: null, error: error }));
 	}
 
-	private getUserId(username: string, password: string) : Promise<string> {
-		return this.http.get(this.buildsForUserUrl(username, null, 1), { headers: this.buildHeaders(username, password) })
+	private getUserId(account: string, username: string, password: string) : Promise<string> {
+		// Profile APIs that would expose the user id directly are only accessible through OAuth.
+		// Retrieving a random build of the given user for now, which contains the user id.
+		return this.http.get(this.buildsForUserUrl(account, username, null, 1), { headers: this.buildHeaders(username, password) })
 			.toPromise()
 			.then((response: Response) => {
 				let result: IBuildInfo[] = response.json().value;
@@ -59,13 +69,17 @@ export class VisualStudioService {
 			});
 	}
 
-	private pullRequestsCreatedByUserUrl(userId: string) : string {
-		return 'https://' + VisualStudioConfig.domain + '.visualstudio.com/_apis/git/repositories/' +
+	private getProjectsUrl(account: string) : string {
+		return "https://" + account + ".visualstudio.com/_apis/projects?api-version=1.0&stateFilter=WellFormed";
+	}
+
+	private pullRequestsCreatedByUserUrl(account: string, userId: string) : string {
+		return 'https://' + account + '.visualstudio.com/_apis/git/repositories/' +
 			VisualStudioConfig.repository + '/pullRequests?api-version=1.0-preview.1&creatorId=' + userId + '&status=All';
 	}
 
-	private buildsForUserUrl(username: string, buildQueue: string, top: number): string {
-		let url: string = 'https://' + VisualStudioConfig.domain + '.visualstudio.com/DefaultCollection/' +
+	private buildsForUserUrl(account: string, username: string, buildQueue: string, top: number): string {
+		let url: string = 'https://' + account + '.visualstudio.com/DefaultCollection/' +
 			VisualStudioConfig.team + '/_apis/build/builds?api-version=2.0&requestedFor=' + username;
 
 		if (buildQueue) {
@@ -89,5 +103,6 @@ export class VisualStudioService {
 	constructor(private http: Http) {
 	}
 
+	// TODO: This needs to be indexed by account as well, otherwise we mix up user IDs for the same user name but different accounts.
 	private userIdByUserName: any = {};
 }
